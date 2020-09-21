@@ -1,0 +1,20 @@
+.wrapper{
+    height: 100vh;
+    background-color: #61DAFB;
+    width: 250px;
+    margin: 0;
+}
+
+.title {
+    font-size: 30px;
+    color:#fff;
+    text-align: center;
+    padding: 30px 0;
+}
+
+.menu-item {
+    font-size: 18px;
+    color:#fff;
+    padding: 10px 10px;
+    cursor: pointer;
+}
