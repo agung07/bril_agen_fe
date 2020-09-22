@@ -22,7 +22,7 @@ class FormEntryDataStrukturAgen extends Component {
     getData = async () => {
         try {
             const getAgenDropdown = await  axios.get('http://localhost:8000/agen');
-            console.log("getAgenDropdown: ", getAgenDropdown);
+            
             if(getAgenDropdown.status === 200 ){ 
                 const { fields } = this.state;
                 this.setState({
@@ -36,7 +36,6 @@ class FormEntryDataStrukturAgen extends Component {
                 })
             } else throw new Error(getAgenDropdown.data)
         } catch (error) {
-            console.log("getAgenDropdown error: ", error)
             
         }
     }
@@ -45,7 +44,7 @@ class FormEntryDataStrukturAgen extends Component {
     getDataAtasan = async (wilayah, level) => {
         try {
             const getAtasanAgenLevelDropdown = await  axios.get(`http://localhost:8000/atasan_agen?urutan=${level}&wilayah=${wilayah}`);
-            console.log("getAtasanAgenLevelDropdown: ", getAtasanAgenLevelDropdown)
+
             if(getAtasanAgenLevelDropdown.status === 200) {
                 const { fields } = this.state;
                 this.setState({
@@ -62,7 +61,6 @@ class FormEntryDataStrukturAgen extends Component {
 
             }
         } catch (error) {
-            console.log("getDataAtasan error: ", error)
         }
     }
 
@@ -145,27 +143,35 @@ class FormEntryDataStrukturAgen extends Component {
     }
 
     onSubmit = async () => {
-        console.log("onSubmit: ", this.state)
         const validate = this.onValidation()
-        // if(validate.error) return;
-        // try {
-        //     const createStrukturAgen = await axios.post(`http://localhost:8000/create_struktur_agen`, validate.data);
-        //     console.log("createStrukturAgen: ", createStrukturAgen)
-        //     if(createStrukturAgen.status === 200) {
-        //         this.setState({
-        //             alert:{
-        //                 show: true,
-        //                 success: true,
-        //                 message: createStrukturAgen.data,
-        //                 showConfirm: true,
-        //                 onConfirm: () => this.setState({ alert: initialState.alert }, () => this.props.history.push('/agen_level_base_on_location'))
-        //             }
-        //         })
-        //     }
+        if(validate.error) return;
+        try {
+            const createStrukturAgen = await axios.post(`http://localhost:8000/create_struktur_agen`, validate.data);
+
+            if(createStrukturAgen.status === 200) {
+                this.setState({
+                    alert:{
+                        show: true,
+                        success: true,
+                        message: createStrukturAgen.data,
+                        showConfirm: true,
+                        onConfirm: () => this.setState({ alert: initialState.alert }, () => this.props.history.push('/agen_level_base_on_location'))
+                    }
+                })
+            } else throw new Error(createStrukturAgen?.data)
             
-        // } catch (error) {
+        } catch (error) {
+            this.setState({
+                alert:{
+                    show: true,
+                    error: true,
+                    message: 'Data struktur agen gagal dibuat',
+                    showConfirm: true,
+                    onConfirm: () => this.setState({ alert: initialState.alert })
+                }
+            })
             
-        // }
+        }
     }
 
     onValidation = () => {
@@ -188,10 +194,9 @@ class FormEntryDataStrukturAgen extends Component {
             }
         })
 
-        console.log("fields.berlaku_mulai.value?.getTime(): ", fields.berlaku_mulai.value?.getTime())
-        console.log("fields.berlaku_mulai.value?.getTime(): ", fields.berlaku_akhir.value?.getTime())
-        if(fields.berlaku_mulai.value?.getTime() > fields.berlaku_akhir.value?.getTime()) {
-            fields.berlaku_akhir.error = '*Berlaku Akhir tidak bisa sebelum Berlaku Mulai'
+        if(fields.berlaku_mulai.value?.getTime() >= fields.berlaku_akhir.value?.getTime()) {
+            fields.berlaku_akhir.error = '*Berlaku Akhir tidak bisa sama atau sebelum Berlaku Mulai';
+            result.error = true;
         }
         if(result.error) this.setState({fields});
         return result;

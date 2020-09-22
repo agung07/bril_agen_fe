@@ -15,7 +15,7 @@ class Bootstrap extends Component {
     render() {
         return (
             <Router>
-                <div className="d-flex">
+                <div className="app-wrapper ">
                     <SideBar />
                     <div className="p-5">
                     <Suspense fallback={<div>Loading...</div>}>
